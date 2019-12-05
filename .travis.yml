@@ -1,0 +1,28 @@
+# Not 'language: python' because there will be projects in multiple languages.
+language: minimal
+dist: bionic
+
+cache:
+- pip
+install:
+- sudo bash -c 'echo "deb http://us.archive.ubuntu.com/ubuntu/ bionic-updates universe" >> /etc/apt/sources.list'
+- sudo bash -c 'echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic-updates universe" >> /etc/apt/sources.list'
+- sudo apt-get update
+- sudo apt-get install python3.8 python3-tk python3.8-distutils python3.8-venv  # https://bugs.launchpad.net/ubuntu/+source/python3.8/+bug/1851684
+- sudo apt-get install valgrind clang-format
+- python3.8 -m venv .py38
+- source .py38/bin/activate
+- python --version
+- python3 --version
+- pip install -r requirements.txt -r requirements-dev.txt
+- valgrind --version
+- clang-format --version
+script:
+- find task??-* -iname '*.py' | xargs flake8 --max-line-length=100 --show-source
+- find task??-* -iname '*.py' | xargs pylint --max-line-length=100 --disable=invalid-name,missing-docstring,global-statement,too-many-lines,R --enable=simplifiable-if-statement,redefined-variable-type
+- find task??-* -iname '*.py' | xargs mypy --ignore-missing-imports
+- pushd task04-tsqueue/
+- diff -u <(cat src/*) <(clang-format -style=file src/*)
+- cmake . && make
+- valgrind --tool=memcheck --leak-check=full --error-exitcode=1 ./queue_test
+- popd

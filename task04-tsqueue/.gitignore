@@ -1,0 +1,9 @@
+Makefile
+queue_test
+tsqueue_test
+CMakeFiles/
+*.cmake
+CMakeCache.txt
+*.exe
+queue_test
+tsqueue_test

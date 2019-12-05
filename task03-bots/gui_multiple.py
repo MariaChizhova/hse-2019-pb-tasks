@@ -7,15 +7,19 @@ from bot import UserIndependentBot
 
 
 class UserWidget(tkinter.LabelFrame):
+    """Класс, реализующий графический интерфейс для работы с одним пользователем."""
     def __init__(self,
                  text: str,
                  send_message_cb: Callable[[str], None],
                  master: Optional[tkinter.Tk] = None):
+        """Конструктор.
+        send_message_cb - функция, которую нужно вызвать, чтобы отправить сообщение боту."""
         super().__init__(master, text=text)
         self.send_message_cb = send_message_cb
         self.create_widgets()
 
     def create_widgets(self) -> None:
+        """Создаёт часть интерфейса для одного пользователя."""
         self.lines = tkinter.Text(self, wrap='word', state=tkinter.DISABLED, width=1, height=1)
         self.lines.pack(expand=1, fill=tkinter.BOTH, padx=4, pady=4)
 
@@ -30,15 +34,20 @@ class UserWidget(tkinter.LabelFrame):
         self.send_button.pack(side=tkinter.RIGHT, padx=4)
 
     def received_message(self, message: str) -> None:
+        """Эту функцию вызывает бот для отправки сообщения пользователю.
+        Она печатает сообщение в чат."""
         self.add_lines(message)
 
     def send_message(self) -> None:
+        """Эта функция вызвается при отправке сообщения пользователем.
+        Отправляет сообщение боту и печатает его в чат."""
         message = self.new_command.get()  # type: ignore
         self.new_command.delete(0, len(message))
         self.add_lines('> ' + message)
         self.send_message_cb(message)
 
     def add_lines(self, line: str) -> None:
+        """Печатает текст в чат пользователя."""
         self.lines.configure(state=tkinter.NORMAL)
         self.lines.insert(tkinter.END, line + '\n')  # type: ignore
         self.lines.configure(state=tkinter.DISABLED)
