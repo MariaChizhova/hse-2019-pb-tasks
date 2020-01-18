@@ -10,13 +10,17 @@ install:
 - sudo apt-get update
 - sudo apt-get install python3.8 python3-tk python3.8-distutils python3.8-venv  # https://bugs.launchpad.net/ubuntu/+source/python3.8/+bug/1851684
 - sudo apt-get install valgrind clang-format
+- sudo apt-get install haskell-platform hlint libghc-hunit-dev
 - python3.8 -m venv .py38
 - source .py38/bin/activate
 - python --version
 - python3 --version
+- pip install wheel  # https://stackoverflow.com/a/44862371/767632
 - pip install -r requirements.txt -r requirements-dev.txt
 - valgrind --version
 - clang-format --version
+- ghc --version
+- hlint --version
 script:
 - find task??-* -iname '*.py' | xargs flake8 --max-line-length=100 --show-source
 - find task??-* -iname '*.py' | xargs pylint --max-line-length=100 --disable=invalid-name,missing-docstring,global-statement,too-many-lines,R --enable=simplifiable-if-statement,redefined-variable-type
@@ -25,4 +29,10 @@ script:
 - diff -u <(cat src/*) <(clang-format -style=file src/*)
 - cmake . && make
 - valgrind --tool=memcheck --leak-check=full --error-exitcode=1 ./queue_test
+- popd
+- pushd task05-fp-exercises
+- ghc -W -Wno-unused-matches -Wno-unused-imports Exercises.hs
+- ghc -W RunTests.hs
+- if [ "$TRAVIS_PULL_REQUEST" != "false" ] ; then ./RunTests; else echo Skipping running tests for non-PRs; fi
+- hlint "--ignore=Unnecessary hiding" "--ignore=Use foldr" Exercises.hs
 - popd
