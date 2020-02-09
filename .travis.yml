@@ -4,6 +4,9 @@ dist: bionic
 
 cache:
 - pip
+before_install:
+- git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
+- git fetch origin master
 install:
 - sudo bash -c 'echo "deb http://us.archive.ubuntu.com/ubuntu/ bionic-updates universe" >> /etc/apt/sources.list'
 - sudo bash -c 'echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic-updates universe" >> /etc/apt/sources.list'
@@ -33,6 +36,12 @@ script:
 - pushd task05-fp-exercises
 - ghc -W -Wno-unused-matches -Wno-unused-imports Exercises.hs
 - ghc -W RunTests.hs
-- if [ "$TRAVIS_PULL_REQUEST" != "false" ] ; then ./RunTests; else echo Skipping running tests for non-PRs; fi
+- if [ -n "$(git log -1 --pretty=format:%H origin/master..HEAD -- .)" ] ; then ./RunTests; else echo Skipping running tests for unchanged task; fi
 - hlint "--ignore=Unnecessary hiding" "--ignore=Use foldr" Exercises.hs
+- popd
+- pushd task06-fp-yat
+- ghc -W -Wno-unused-matches -Wno-unused-imports Yat.hs
+- ghc -W RunTests.hs
+- if [ -n "$(git log -1 --pretty=format:%H origin/master..HEAD -- .)" ] ; then ./RunTests; else echo Skipping running tests for unchanged task; fi
+- hlint "--ignore=Avoid lambda" Yat.hs
 - popd
