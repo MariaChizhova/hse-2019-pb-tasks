@@ -3,7 +3,7 @@ import Yat
 import Test.HUnit
 import System.Exit
 
-check name a b = TestLabel name $ TestCase $ assertEqual "" a b
+checkGE name got expected = TestLabel name $ TestCase $ assertEqual "" expected got
 group name elems = TestLabel name $ TestList elems
 
 (/+) = BinaryOperation Add
@@ -68,16 +68,16 @@ program5 = ([],
 
 testAll = TestList [
     group "program1" [
-      check "output" (showProgram program1) $ concat [
+      checkGE "output" (showProgram program1) $ concat [
         "func fib(a) = if ((a == 0) || (a == 1)) then {\n",
         "\t1\n",
         "} else (fib((a - 1)) + fib((a - 2))) fi\n",
         "fib(25)"
       ],
-      check "result" (eval program1) $ 121393
+      checkGE "result" (eval program1) $ 121393
     ],
     group "program2" [
-      check "output" (showProgram program2) $ concat [
+      checkGE "output" (showProgram program2) $ concat [
         "{\n",
         "\tlet a = 10 tel;\n",
         "\t{\n",
@@ -86,10 +86,10 @@ testAll = TestList [
         "\t(a + (b * a))\n",
         "}"
       ],
-      check "result" (eval program2) $ 210
+      checkGE "result" (eval program2) $ 210
     ],
     group "program3" [
-      check "output" (showProgram program3) $ concat [
+      checkGE "output" (showProgram program3) $ concat [
         "func f(param) = {\n",
         "\tlet a = (a + 1) tel;\n",
         "\tlet param = (param + 1) tel;\n",
@@ -103,10 +103,10 @@ testAll = TestList [
         "\t(((res * 100) + (b * 10)) + a)\n",
         "}"
       ],
-      check "result" (eval program3) $ 47283
+      checkGE "result" (eval program3) $ 47283
     ],
     group "program4" [
-      check "output" (showProgram program4) $ concat [
+      checkGE "output" (showProgram program4) $ concat [
         "{\n",
         "\t(a + if {\n",
         "\t\t(let a = 3 tel * 4);\n",
@@ -124,14 +124,14 @@ testAll = TestList [
       ]
     ],
     group "program5" [
-      check "output" (showProgram program5) $ concat [
+      checkGE "output" (showProgram program5) $ concat [
         "if let res = ((let a = 3 tel * 10) + let a = (a + (2 || let b = 5 tel)) tel) tel then {\n",
         "\t((((res * 1000) + (a * 100)) + (b * 10)) + (1 + {\n",
         "\t}))\n",
         "} else {\n",
         "} fi"
       ],
-      check "result" (eval program5) $ 34451
+      checkGE "result" (eval program5) $ 34451
     ]
   ]
 
